@@ -1,4 +1,4 @@
-module server
+module challenge1/server
 
 go 1.21.0
 
