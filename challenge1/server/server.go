@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -12,9 +13,10 @@ import (
 )
 
 const (
-	EXCHANGE_URL = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
-	TIMEOUT_MS   = 200
-	SQLITE_DB    = "./exchange.db"
+	EXCHANGE_URL        = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
+	TIMEOUT_MS          = 200
+	DATABASE_TIMEOUT_MS = 10
+	SQLITE_DB           = "./exchange.db"
 )
 
 type Exchange struct {
@@ -88,15 +90,23 @@ func saveExchange(ctx context.Context, exchange Exchange) error {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO exchange(code, codein, name, high, low, varBid, pctChange, bid, ask, timestamp, createDate) values(?,?,?,?,?,?,?,?,?,?,?)")
-	if err != nil {
-		panic(err)
+	ctx, cancel := context.WithTimeout(ctx, DATABASE_TIMEOUT_MS*time.Millisecond)
+	defer cancel()
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("timeout")
+	case <-time.After(DATABASE_TIMEOUT_MS * time.Millisecond):
+		stmt, err := db.Prepare("INSERT INTO exchange(code, codein, name, high, low, varBid, pctChange, bid, ask, timestamp, createDate) values(?,?,?,?,?,?,?,?,?,?,?)")
+		if err != nil {
+			panic(err)
+		}
+		defer stmt.Close()
+		_, err = stmt.Exec(exchange.Usdbrl.Code, exchange.Usdbrl.Codein, exchange.Usdbrl.Name, exchange.Usdbrl.High, exchange.Usdbrl.Low, exchange.Usdbrl.VarBid, exchange.Usdbrl.PctChange, exchange.Usdbrl.Bid, exchange.Usdbrl.Ask, exchange.Usdbrl.Timestamp, exchange.Usdbrl.CreateDate)
+		return err
+
 	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(exchange.Usdbrl.Code, exchange.Usdbrl.Codein, exchange.Usdbrl.Name, exchange.Usdbrl.High, exchange.Usdbrl.Low, exchange.Usdbrl.VarBid, exchange.Usdbrl.PctChange, exchange.Usdbrl.Bid, exchange.Usdbrl.Ask, exchange.Usdbrl.Timestamp, exchange.Usdbrl.CreateDate)
-
-	return err
+	return nil
 
 }
 
