@@ -50,7 +50,7 @@ func TestGetCEP(t *testing.T) {
 	var viaCEPChannel = make(chan string)
 	viaCepService := NewViaCep(&viaCEPChannel)
 
-	go viaCepService.GetCEP("01001000")
+	go viaCepService.GetCEP("01001-000")
 
 	cep := <-viaCEPChannel
 

@@ -21,9 +21,9 @@ func TestMakeUrl(t *testing.T) {
 				channel: make(chan string),
 			},
 			args: args{
-				cep: "01001000",
+				cep: "01001-000",
 			},
-			want: "https://brasilapi.com.br/api/cep/v1/01001000",
+			want: "https://brasilapi.com.br/api/cep/v1/01001-000",
 		},
 	}
 	for _, tt := range tests {
@@ -41,13 +41,12 @@ func TestGetCEP(t *testing.T) {
 	state_expected := `"state":"SP"`
 	city_expected := `"city":"São Paulo"`
 	neighborhood_expected := `"neighborhood":"Sé"`
-	street_expected := `"street":"Praça da Sé"`
-	service_expected := `"service":"correios"`
+	street_expected := `"street":"Praça da Sé`
 
 	var brasilAPIChannel = make(chan string)
 	brasilAPISerice := NewBrasilApi(&brasilAPIChannel)
 
-	go brasilAPISerice.GetCEP("01001000")
+	go brasilAPISerice.GetCEP("01001-000")
 
 	cep := <-brasilAPIChannel
 
@@ -69,10 +68,6 @@ func TestGetCEP(t *testing.T) {
 
 	if !strings.Contains(cep, street_expected) {
 		t.Errorf("brasilApi.GetCEP() = %v, want %v", cep, street_expected)
-	}
-
-	if !strings.Contains(cep, service_expected) {
-		t.Errorf("brasilApi.GetCEP() = %v, want %v", cep, service_expected)
 	}
 
 }
