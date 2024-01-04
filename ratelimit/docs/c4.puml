@@ -1,0 +1,12 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(client, "Client", "Someone trying to access the system")
+Container(app, "App", "Application with Rate Limit Policy")
+Container(db, "DB", "Redis", "Database with Rate Limit Policy")
+
+Rel(client, app, "Request", "HTTP")
+
+Rel(app, db, "check hate limit", "RESP")
+
+@enduml

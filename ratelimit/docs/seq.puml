@@ -1,0 +1,28 @@
+@startuml
+autoactivate on
+
+actor user
+participant API
+database "REDIS" as DB
+
+
+user -> API: POST /api/v1/status
+API -> DB : check rate limit IP and Token
+return Rate limit data
+API -> API : check rate limit rules
+alt rate limit exceeded
+    API -> user : return 429
+    note right
+        CODE: 429 
+        MSG: you have reached the maximum number of requests or actions allowed within a certain time frame
+    end note
+else
+    API -> user : return 200
+    note right
+        CODE: 200
+        MSG: OK
+    end note
+end
+
+
+@enduml
