@@ -19,11 +19,25 @@ type redisRateLimiter struct {
 	maxRequestTokenSecond    int
 	requestBlockingTimeIP    int
 	requestBlockingTimeToken int
+	rateLimiterIPEnabled     bool
+	rateLimiterTokenEnabled  bool
 	redisClient              *redis.Client
 }
 
-func NewRedisRateLimiter(host string, port string, db int, password string, rateLimitTTL, maxRequestIPSecond, maxRequestTokenSecond, RequestBlockingTimeIP, RequestBlockingTimeToken int) *redisRateLimiter {
-
+func NewRedisRateLimiter(
+	host string,
+	port string,
+	db int,
+	password string,
+	rateLimitTTL int,
+	maxRequestIPSecond int,
+	maxRequestTokenSecond int,
+	RequestBlockingTimeIP int,
+	RequestBlockingTimeToken int,
+	RateLimiterIPEnabled bool,
+	RateLimiterTokenEnabled bool,
+) *redisRateLimiter {
+	fmt.Printf("%s:%s /n", host, port)
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", host, port),
 		Password: password,
@@ -45,6 +59,8 @@ func NewRedisRateLimiter(host string, port string, db int, password string, rate
 		maxRequestTokenSecond:    maxRequestTokenSecond,
 		requestBlockingTimeIP:    RequestBlockingTimeIP,
 		requestBlockingTimeToken: RequestBlockingTimeToken,
+		rateLimiterIPEnabled:     RateLimiterIPEnabled,
+		rateLimiterTokenEnabled:  RateLimiterTokenEnabled,
 		redisClient:              redisClient,
 	}
 }
@@ -129,11 +145,11 @@ func (r *redisRateLimiter) IsRateLimitExceeded(ip string, token string) bool {
 		return true
 	}
 
-	if token != "" {
+	if token != "" && r.rateLimiterTokenEnabled {
 		isRateLimitExceeded = r.isTokenRateLimitExceeded(token)
 	}
 
-	if !isRateLimitExceeded {
+	if !isRateLimitExceeded && r.rateLimiterIPEnabled {
 		isRateLimitExceeded = r.isIpRateLimitExceeded(ip)
 	}
 

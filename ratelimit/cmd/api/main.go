@@ -28,7 +28,10 @@ func main() {
 		config.MaxRequestTokenSecond,
 		config.RequestBlockingTimeIP,
 		config.RequestBlockingTimeToken,
+		config.RateLimiterIPEnabled,
+		config.RateLimiterTokenEnabled,
 	)
+
 	rateLimiter := customMiddleware.NewRateLimiter(limiter)
 
 	// create web server
