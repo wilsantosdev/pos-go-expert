@@ -30,5 +30,16 @@ Para que seja possível configurar os parametros do ratelimit algumas variáveis
 # Executando aplicação
 Para executar a aplicação utilize o comando a baixo: 
 ```
-docker compose -f deployments/local/docker-compose.yml up -d
+docker compose up -d redis app
+```
+
+Para acessar o conteúdo da API basta acessar a url `http://localhost:8000/v1/status` 
+
+Para executar chamadas usando restClient basta usar o [arquivo](./api/status.http) onde pode realizar chamadas Get com e sem token
+
+# Executando teste de carga
+Para executar o teste de carga, basta iniciar o K6 pelo comando no docker
+K6 é uma ferramenta de teste de carga open source, para mais informações acessar o [site](https://k6.io/)
+```
+docker compose up k6
 ```
