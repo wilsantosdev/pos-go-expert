@@ -68,4 +68,9 @@ type Limiter interface {
 }
 ```
 
-A implementação com redis foi feita no serviço [redisRateLimiter](./internal/service/redis_limiter.go)
+A implementação com redis foi feita no serviço [redisRateLimiter](./internal/service/redis_limiter.go) , mas o middleware recebe em sua criação qualquer estrutura que implemente a interface **Limiter**
+```
+/...
+rateLimiter := customMiddleware.NewRateLimiter(limiter)
+.../
+```
