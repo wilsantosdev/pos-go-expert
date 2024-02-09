@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>entity: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">stresser/internal/domain/entity/report.go (100.0%)</option>
+				
+				<option value="file1">stresser/internal/domain/entity/request_response.go (100.0%)</option>
+				
+				<option value="file2">stresser/internal/services/looper.go (94.1%)</option>
+				
+				<option value="file3">stresser/internal/services/reporter.go (0.0%)</option>
+				
+				<option value="file4">stresser/internal/services/requester.go (88.9%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package entity
+
+import "time"
+
+type Report struct {
+        responses []RequestResponse
+}
+
+func NewReport() *Report <span class="cov8" title="1">{
+        return &amp;Report{}
+}</span>
+
+func (r *Report) AddResponse(response RequestResponse) <span class="cov8" title="1">{
+        r.responses = append(r.responses, response)
+}</span>
+
+func (r *Report) TotalExecutionTime() time.Duration <span class="cov8" title="1">{
+        var totalExecutionTime int64
+        for _, response := range r.responses </span><span class="cov8" title="1">{
+                totalExecutionTime += int64(response.GetRequestTime())
+        }</span>
+        <span class="cov8" title="1">return time.Duration(totalExecutionTime)</span>
+}
+
+func (r *Report) TotalResponses() int32 <span class="cov8" title="1">{
+        return int32(len(r.responses))
+}</span>
+
+func (r *Report) TotalResponses200() int32 <span class="cov8" title="1">{
+        var totalResponses200 int32
+        for _, response := range r.responses </span><span class="cov8" title="1">{
+                if response.GetStatusCode() == 200 </span><span class="cov8" title="1">{
+                        totalResponses200++
+                }</span>
+        }
+        <span class="cov8" title="1">return totalResponses200</span>
+}
+
+func (r *Report) TotalNon200Responses() map[int32]int32 <span class="cov8" title="1">{
+        totalNon200Responses := make(map[int32]int32)
+        for _, response := range r.responses </span><span class="cov8" title="1">{
+                if response.GetStatusCode() != 200 </span><span class="cov8" title="1">{
+                        totalNon200Responses[response.GetStatusCode()]++
+                }</span>
+        }
+        <span class="cov8" title="1">return totalNon200Responses</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package entity
+
+import "time"
+
+type RequestResponse struct {
+        url         string
+        statusCode  int32
+        error       error
+        requestTime time.Duration
+}
+
+func NewRequestResponse(url string, statusCode int32, err error, requestTime time.Duration) *RequestResponse <span class="cov8" title="1">{
+        return &amp;RequestResponse{
+                url:         url,
+                statusCode:  statusCode,
+                error:       err,
+                requestTime: requestTime,
+        }
+}</span>
+
+func (r *RequestResponse) GetUrl() string <span class="cov8" title="1">{
+        return r.url
+}</span>
+
+func (r *RequestResponse) GetStatusCode() int32 <span class="cov8" title="1">{
+        return r.statusCode
+}</span>
+
+func (r *RequestResponse) GetError() error <span class="cov8" title="1">{
+        return r.error
+}</span>
+
+func (r *RequestResponse) GetRequestTime() time.Duration <span class="cov8" title="1">{
+        return r.requestTime
+}</span>
+
+func (r *RequestResponse) IsError() bool <span class="cov8" title="1">{
+        return r.error != nil
+}</span>
+
+func (r *RequestResponse) IsSuccess() bool <span class="cov8" title="1">{
+        return r.statusCode == 200 &amp;&amp; r.error == nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package services
+
+import (
+        "fmt"
+        "stresser/internal/domain/entity"
+        "stresser/internal/domain/interfaces"
+        "sync"
+)
+
+type looper struct {
+        requester interfaces.Requester
+}
+
+func NewLooper(requester interfaces.Requester) *looper <span class="cov8" title="1">{
+        return &amp;looper{
+                requester: requester,
+        }
+}</span>
+
+func (l *looper) Loop(concurrent int, requests int, url string) (entity.Report, error) <span class="cov8" title="1">{
+        wg := sync.WaitGroup{}
+        exeChannel := make(chan int, concurrent)
+        report := entity.NewReport()
+        defer close(exeChannel)
+        for i := 0; i &lt; requests; i++ </span><span class="cov8" title="1">{
+                exeChannel &lt;- i
+                wg.Add(1)
+                go func() </span><span class="cov8" title="1">{
+                        defer wg.Done()
+                        requestResponse, err := l.requester.Request(url)
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println(err)
+                        }</span>
+                        <span class="cov8" title="1">report.AddResponse(*requestResponse)
+                        &lt;-exeChannel</span>
+                }()
+
+        }
+        <span class="cov8" title="1">wg.Wait()
+
+        return *report, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package services
+
+import (
+        "fmt"
+        "stresser/internal/domain/entity"
+)
+
+type reporter struct {
+        report entity.Report
+}
+
+func NewReporter(report entity.Report) *reporter <span class="cov0" title="0">{
+        return &amp;reporter{
+                report: report,
+        }
+}</span>
+
+func (r *reporter) Report() <span class="cov0" title="0">{
+        totalExecutionTime := r.report.TotalExecutionTime()
+        totalResponses := r.report.TotalResponses()
+        totalResponses200 := r.report.TotalResponses200()
+        totalNon200Responses := r.report.TotalNon200Responses()
+
+        fmt.Printf("Total execution time: %v\n", totalExecutionTime)
+        fmt.Printf("Total Requests: %v\n", totalResponses)
+        fmt.Printf("Total 200 Responses: %v\n", totalResponses200)
+
+        for statusCode, total := range totalNon200Responses </span><span class="cov0" title="0">{
+                fmt.Printf("Total %v Responses: %v\n", statusCode, total)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package services
+
+import (
+        "fmt"
+        "net/http"
+        "stresser/internal/domain/entity"
+        "time"
+)
+
+type requester struct{}
+
+func NewRequester() *requester <span class="cov8" title="1">{
+        return &amp;requester{}
+}</span>
+
+func (r *requester) Request(url string) (*entity.RequestResponse, error) <span class="cov8" title="1">{
+
+        start := time.Now()
+
+        resp, err := http.Get(url)
+
+        elapsed := time.Since(start)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if resp.StatusCode != http.StatusOK </span><span class="cov8" title="1">{
+                err = fmt.Errorf("status code is not 200, it is %d", resp.StatusCode)
+        }</span>
+
+        <span class="cov8" title="1">return entity.NewRequestResponse(url, int32(resp.StatusCode), err, elapsed), nil</span>
+
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
