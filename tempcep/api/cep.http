@@ -1,0 +1,5 @@
+GET http://localhost:8080/cep/30012006 HTTP/1.1
+
+### 
+
+GET https://api.weatherapi.com/v1/current.json?key=0f169cdbb92a4202838134930241902&q=Rio%20de%20Janeiro%20-%20RJ HTTP/1.1
