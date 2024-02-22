@@ -1,0 +1,27 @@
+mode: set
+tempcep/internal/domain/custom_error/cep.go:5.42,7.2 1 1
+tempcep/internal/domain/custom_error/cep_service.go:5.37,7.2 1 1
+tempcep/internal/domain/entity/cep.go:12.40,14.58 1 1
+tempcep/internal/domain/entity/cep.go:14.58,16.3 1 1
+tempcep/internal/domain/entity/cep.go:18.2,18.31 1 1
+tempcep/internal/domain/entity/cep.go:21.29,23.2 1 1
+tempcep/internal/domain/entity/temperatures.go:9.87,15.2 1 1
+tempcep/internal/domain/entity/temperatures.go:17.41,19.2 1 1
+tempcep/internal/domain/entity/temperatures.go:21.43,23.2 1 1
+tempcep/internal/domain/entity/temperatures.go:25.40,27.2 1 1
+tempcep/internal/service/via_cep.go:30.25,32.2 1 1
+tempcep/internal/service/via_cep.go:34.66,40.16 4 1
+tempcep/internal/service/via_cep.go:40.16,42.3 1 0
+tempcep/internal/service/via_cep.go:43.2,47.65 3 1
+tempcep/internal/service/via_cep.go:47.65,49.3 1 0
+tempcep/internal/service/via_cep.go:51.2,51.27 1 1
+tempcep/internal/service/via_cep.go:51.27,53.3 1 1
+tempcep/internal/service/via_cep.go:55.2,55.47 1 1
+tempcep/internal/service/weather_api.go:64.46,66.2 1 1
+tempcep/internal/service/weather_api.go:68.103,75.16 4 1
+tempcep/internal/service/weather_api.go:75.16,77.3 1 0
+tempcep/internal/service/weather_api.go:79.2,82.16 3 1
+tempcep/internal/service/weather_api.go:82.16,84.3 1 0
+tempcep/internal/service/weather_api.go:86.2,90.65 3 1
+tempcep/internal/service/weather_api.go:90.65,92.3 1 0
+tempcep/internal/service/weather_api.go:94.2,94.72 1 1

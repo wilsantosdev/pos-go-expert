@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -71,8 +72,9 @@ func (w weatherApi) GetTemperatureByCity(city string) (celsius, farenheit, kelvi
 	}
 
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s?key=%s&q=%s", WEATHER_API_URL, w.apiKey, url.QueryEscape(city)), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s?key=%s&q=%s-BR", WEATHER_API_URL, w.apiKey, url.QueryEscape(city)), nil)
 	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
 		return 0, 0, 0, err
 	}
 
