@@ -37,7 +37,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - jaeger
+      - jaeger-all-in-one
       - prometheus
       - otel-collector
 
@@ -51,6 +51,6 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - jaeger
+      - jaeger-all-in-one
       - prometheus
       - otel-collector
