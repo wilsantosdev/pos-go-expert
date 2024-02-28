@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>custom_error: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">serviceb/internal/domain/custom_error/cep.go (100.0%)</option>
+				
+				<option value="file1">serviceb/internal/domain/custom_error/cep_service.go (100.0%)</option>
+				
+				<option value="file2">serviceb/internal/domain/entity/cep.go (100.0%)</option>
+				
+				<option value="file3">serviceb/internal/domain/entity/temperatures.go (100.0%)</option>
+				
+				<option value="file4">serviceb/internal/service/via_cep.go (84.6%)</option>
+				
+				<option value="file5">serviceb/internal/service/weather_api.go (75.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package customerror
+
+type CEPInvalidFormat struct{}
+
+func (e CEPInvalidFormat) Error() string <span class="cov8" title="1">{
+        return "CEP invalid format"
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package customerror
+
+type CEPNotFound struct{}
+
+func (e CEPNotFound) Error() string <span class="cov8" title="1">{
+        return "CEP not found"
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package entity
+
+import (
+        "regexp"
+        customerror "serviceb/internal/domain/custom_error"
+)
+
+type CEP struct {
+        value string
+}
+
+func NewCEP(value string) (CEP, error) <span class="cov8" title="1">{
+
+        if !regexp.MustCompile(`^[0-9]{8}$`).MatchString(value) </span><span class="cov8" title="1">{
+                return CEP{}, customerror.CEPInvalidFormat{}
+        }</span>
+
+        <span class="cov8" title="1">return CEP{value: value}, nil</span>
+}
+
+func (c CEP) Value() string <span class="cov8" title="1">{
+        return c.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package entity
+
+type Temperatures struct {
+        city      string
+        celsius   float64
+        farenheit float64
+        kelvin    float64
+}
+
+func NewTemperatures(city string, celsius float64, farenheit float64, kelvin float64) Temperatures <span class="cov8" title="1">{
+        return Temperatures{
+                city:      city,
+                celsius:   celsius,
+                farenheit: farenheit,
+                kelvin:    kelvin,
+        }
+}</span>
+
+func (t Temperatures) Celsius() float64 <span class="cov8" title="1">{
+        return t.celsius
+}</span>
+
+func (t Temperatures) Farenheit() float64 <span class="cov8" title="1">{
+        return t.farenheit
+}</span>
+
+func (t Temperatures) Kelvin() float64 <span class="cov8" title="1">{
+        return t.kelvin
+}</span>
+
+func (t Temperatures) City() string <span class="cov8" title="1">{
+        return t.city
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package service
+
+import (
+        "crypto/tls"
+        "encoding/json"
+        "net/http"
+        customerror "serviceb/internal/domain/custom_error"
+        "serviceb/internal/domain/entity"
+)
+
+const (
+        VIA_CEP_URL = "https://viacep.com.br/ws/"
+)
+
+type viaCep struct{}
+
+type viaCepResponse struct {
+        Cep         string `json:"cep"`
+        Logradouro  string `json:"logradouro"`
+        Complemento string `json:"complemento"`
+        Bairro      string `json:"bairro"`
+        Localidade  string `json:"localidade"`
+        Uf          string `json:"uf"`
+        Ibge        string `json:"ibge"`
+        Gia         string `json:"gia"`
+        Ddd         string `json:"ddd"`
+        Siafi       string `json:"siafi"`
+}
+
+func NewViaCep() viaCep <span class="cov8" title="1">{
+        return viaCep{}
+}</span>
+
+func (v viaCep) GetCityNameByCep(cep entity.CEP) (string, error) <span class="cov8" title="1">{
+        tr := &amp;http.Transport{
+                TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
+        }
+        client := &amp;http.Client{Transport: tr}
+        resp, err := client.Get(VIA_CEP_URL + cep.Value() + "/json/")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">defer resp.Body.Close()
+
+        var data viaCepResponse
+
+        if err := json.NewDecoder(resp.Body).Decode(&amp;data); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">if data.Localidade == "" </span><span class="cov8" title="1">{
+                return "", customerror.CEPNotFound{}
+        }</span>
+
+        <span class="cov8" title="1">return data.Localidade, nil</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package service
+
+import (
+        "crypto/tls"
+        "encoding/json"
+        "fmt"
+        "log"
+        "net/http"
+        "net/url"
+)
+
+const (
+        WEATHER_API_URL = "https://api.weatherapi.com/v1/current.json"
+)
+
+type weatherApi struct {
+        apiKey string
+}
+
+type weatherAPIResponse struct {
+        Location Location `json:"location"`
+        Current  Current  `json:"current"`
+}
+type Location struct {
+        Name           string  `json:"name"`
+        Region         string  `json:"region"`
+        Country        string  `json:"country"`
+        Lat            float64 `json:"lat"`
+        Lon            float64 `json:"lon"`
+        TzID           string  `json:"tz_id"`
+        LocaltimeEpoch int     `json:"localtime_epoch"`
+        Localtime      string  `json:"localtime"`
+}
+type Condition struct {
+        Text string `json:"text"`
+        Icon string `json:"icon"`
+        Code int    `json:"code"`
+}
+type Current struct {
+        LastUpdatedEpoch int       `json:"last_updated_epoch"`
+        LastUpdated      string    `json:"last_updated"`
+        TempC            float64   `json:"temp_c"`
+        TempF            float64   `json:"temp_f"`
+        IsDay            int       `json:"is_day"`
+        Condition        Condition `json:"condition"`
+        WindMph          float64   `json:"wind_mph"`
+        WindKph          float64   `json:"wind_kph"`
+        WindDegree       int       `json:"wind_degree"`
+        WindDir          string    `json:"wind_dir"`
+        PressureMb       float64   `json:"pressure_mb"`
+        PressureIn       float64   `json:"pressure_in"`
+        PrecipMm         float64   `json:"precip_mm"`
+        PrecipIn         float64   `json:"precip_in"`
+        Humidity         int       `json:"humidity"`
+        Cloud            int       `json:"cloud"`
+        FeelslikeC       float64   `json:"feelslike_c"`
+        FeelslikeF       float64   `json:"feelslike_f"`
+        VisKm            float64   `json:"vis_km"`
+        VisMiles         float64   `json:"vis_miles"`
+        Uv               float64   `json:"uv"`
+        GustMph          float64   `json:"gust_mph"`
+        GustKph          float64   `json:"gust_kph"`
+}
+
+func NewWeatherApi(apiKey string) weatherApi <span class="cov8" title="1">{
+        return weatherApi{apiKey: apiKey}
+}</span>
+
+func (w weatherApi) GetTemperatureByCity(city string) (celsius, farenheit, kelvin float64, err error) <span class="cov8" title="1">{
+        tr := &amp;http.Transport{
+                TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
+        }
+
+        client := &amp;http.Client{Transport: tr}
+        req, err := http.NewRequest("GET", fmt.Sprintf("%s?key=%s&amp;q=%s-BR", WEATHER_API_URL, w.apiKey, url.QueryEscape(city)), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Error creating request: %v", err)
+                return 0, 0, 0, err
+        }</span>
+
+        <span class="cov8" title="1">req.Header.Set("Content-Type", "application/json")
+        resp, err := client.Do(req)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, 0, 0, err
+        }</span>
+
+        <span class="cov8" title="1">defer resp.Body.Close()
+
+        var data weatherAPIResponse
+
+        if err := json.NewDecoder(resp.Body).Decode(&amp;data); err != nil </span><span class="cov0" title="0">{
+                return 0, 0, 0, err
+        }</span>
+
+        <span class="cov8" title="1">return data.Current.TempC, data.Current.TempF, data.Current.TempC, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

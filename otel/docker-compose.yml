@@ -1,0 +1,56 @@
+version: '3'
+services:
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14250"
+      - "14268"
+  
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090"
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    restart: always
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "8888:8888"
+      - "8889:8889"
+      - "4317:4317"
+
+  service_a:
+    build: 
+      context: ./service_a
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_PORT=8080
+      - SERVICE_B_URL=http://service_b:8081/cep/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - jaeger
+      - prometheus
+      - otel-collector
+
+  service_b:
+    build: 
+      context: ./service_b
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_PORT=8081
+      - WEATHER_API_KEY=281d4f6003fd4208a4823348242002
+    ports:
+      - "8081:8081"
+    depends_on:
+      - jaeger
+      - prometheus
+      - otel-collector

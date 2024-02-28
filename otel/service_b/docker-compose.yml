@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  app:
+    ports:
+      - 8080:8080
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_PORT=8081
+      - WEATHER_API_KEY=281d4f6003fd4208a4823348242002
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
