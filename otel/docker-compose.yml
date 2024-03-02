@@ -27,6 +27,11 @@ services:
       - "8889:8889"
       - "4317:4317"
 
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
   service_a:
     build: 
       context: ./service_a
@@ -40,6 +45,7 @@ services:
       - jaeger-all-in-one
       - prometheus
       - otel-collector
+      - zipkin
 
   service_b:
     build: 
@@ -54,3 +60,4 @@ services:
       - jaeger-all-in-one
       - prometheus
       - otel-collector
+      - zipkin

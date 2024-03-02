@@ -18,3 +18,7 @@ Para realizar o request no serviço A pode executar com RestClient no [arquivo](
 Para visualizar usando o Jaeger basta acessar o [painel](http://localhost:16686/search) e poderá visualizar informações sobre o request conforme a imagem abaixo
 
 ![painel](./docs/print.png)
+
+Para visualizar usando o Zipkin basta acessar o [painel](http://localhost:9411/zipkin) e oiderá visualizar informações sobre o request conforme a imagem abaixo
+
+![painel](./docs/zipkin.png)
