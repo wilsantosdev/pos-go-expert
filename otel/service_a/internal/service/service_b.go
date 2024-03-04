@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"net/http"
+	customerror "servicea/internal/domain/custom_error"
 	"servicea/internal/domain/entity"
 
 	"go.opentelemetry.io/otel"
@@ -48,6 +49,10 @@ func (s serviceB) GetCEPTemp(cep string, ctx context.Context) (*entity.ServiceBR
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 404 {
+		return nil, customerror.CEPNotFound{}
+	}
 
 	var serviceBResponse entity.ServiceBResponse
 	err = json.NewDecoder(resp.Body).Decode(&serviceBResponse)

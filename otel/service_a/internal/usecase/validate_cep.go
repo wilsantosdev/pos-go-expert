@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"servicea/internal/domain/entity"
 )
 
@@ -33,6 +34,8 @@ func (vc ValidateCep) Handler(input ValidateCepInput, ctx context.Context) (*Val
 	}
 
 	serviceBResponse, err := vc.serviceB.GetCEPTemp(cep.Value(), ctx)
+
+	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}

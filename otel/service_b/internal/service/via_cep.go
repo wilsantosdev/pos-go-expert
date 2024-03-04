@@ -21,16 +21,17 @@ type viaCep struct {
 }
 
 type viaCepResponse struct {
-	Cep         string `json:"cep"`
-	Logradouro  string `json:"logradouro"`
-	Complemento string `json:"complemento"`
-	Bairro      string `json:"bairro"`
-	Localidade  string `json:"localidade"`
-	Uf          string `json:"uf"`
-	Ibge        string `json:"ibge"`
-	Gia         string `json:"gia"`
-	Ddd         string `json:"ddd"`
-	Siafi       string `json:"siafi"`
+	Erro        string `json:"erro,omitempty"`
+	Cep         string `json:"cep,omitempty"`
+	Logradouro  string `json:"logradouro,omitempty"`
+	Complemento string `json:"complemento,omitempty"`
+	Bairro      string `json:"bairro,omitempty"`
+	Localidade  string `json:"localidade,omitempty"`
+	Uf          string `json:"uf,omitempty"`
+	Ibge        string `json:"ibge,omitempty"`
+	Gia         string `json:"gia,omitempty"`
+	Ddd         string `json:"ddd,omitempty"`
+	Siafi       string `json:"siafi,omitempty"`
 }
 
 func NewViaCep(tracer trace.Tracer) *viaCep {
@@ -65,12 +66,11 @@ func (v viaCep) GetCityNameByCep(cep entity.CEP, ctx context.Context) (string, e
 	defer resp.Body.Close()
 
 	var data viaCepResponse
-
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return "", err
 	}
 
-	if data.Localidade == "" {
+	if data.Erro == "true" || data.Localidade == "" {
 		return "", customerror.CEPNotFound{}
 	}
 

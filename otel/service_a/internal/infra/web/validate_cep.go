@@ -3,6 +3,7 @@ package web
 import (
 	"encoding/json"
 	"net/http"
+	customerror "servicea/internal/domain/custom_error"
 	"servicea/internal/usecase"
 
 	"go.opentelemetry.io/otel"
@@ -36,9 +37,15 @@ func (vc validateCep) Handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err)
+	if _, ok := err.(customerror.CEPNotFound); ok {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if _, ok := err.(customerror.CEPInvalidFormat); ok {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		w.Write([]byte(err.Error()))
 		return
 	}
 

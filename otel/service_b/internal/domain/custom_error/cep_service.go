@@ -3,5 +3,5 @@ package customerror
 type CEPNotFound struct{}
 
 func (e CEPNotFound) Error() string {
-	return "CEP not found"
+	return "can not find zipcode"
 }

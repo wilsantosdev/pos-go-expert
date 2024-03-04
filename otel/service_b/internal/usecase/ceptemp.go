@@ -29,7 +29,6 @@ func (u CepTemp) Execute(requestCEP string) (*entity.Temperatures, error) {
 		return nil, err
 	}
 
-	// u.cepService.SetCarrier(u.carrier)
 	city, err := u.cepService.GetCityNameByCep(cep, u.ctx)
 	if err != nil {
 		return nil, err
